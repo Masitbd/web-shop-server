@@ -21,6 +21,23 @@ async function run() {
   try {
     await client.connect();
     console.log("database is connected");
+    const database = client.db("babs");
+    const productsCollection = database.collection("products");
+    const reviewsCollection = database.collection("reviews");
+
+    //Get api show all data
+    app.get("/reviews", async (req, res) => {
+      const cursor = reviewsCollection.find({});
+      const reviews = await cursor.toArray();
+      res.send(reviews);
+    });
+
+    //Get api show all data
+    app.get("/products", async (req, res) => {
+      const cursor = productsCollection.find({});
+      const products = await cursor.toArray();
+      res.send(products);
+    });
   } finally {
     //await client.close();
   }

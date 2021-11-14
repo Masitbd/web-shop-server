@@ -1,5 +1,6 @@
 const express = require("express");
 require("dotenv").config();
+const ObjectId = require("mongodb").ObjectId;
 const app = express();
 const cors = require("cors");
 const { MongoClient, MongoRuntimeError } = require("mongodb");
@@ -24,6 +25,18 @@ async function run() {
     const database = client.db("babs");
     const productsCollection = database.collection("products");
     const reviewsCollection = database.collection("reviews");
+    const usersCollection = database.collection("users");
+
+    // Get single service
+    app.get("/products/:id", async (req, res) => {
+      console.log("hits single record");
+      const id = req.params.id;
+      console.log(id);
+      const query = { _id: ObjectId(id) };
+
+      const product = await productsCollection.findOne(query);
+      res.send(product);
+    });
 
     //Get api show all data
     app.get("/reviews", async (req, res) => {
@@ -37,6 +50,14 @@ async function run() {
       const cursor = productsCollection.find({});
       const products = await cursor.toArray();
       res.send(products);
+    });
+
+    //post Api
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
+      console.log(result);
+      res.json(result);
     });
   } finally {
     //await client.close();
